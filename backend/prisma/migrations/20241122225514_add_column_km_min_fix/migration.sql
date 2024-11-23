@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Driver` MODIFY `kmMin` INTEGER NOT NULL DEFAULT 0;
