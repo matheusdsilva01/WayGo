@@ -1,0 +1,30 @@
+services:
+  database:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: waygodb
+      MYSQL_PASSWORD: root
+    networks:
+      - waygo-network
+    restart: always
+
+  backend:
+    depends_on:
+        database:
+          condition: service_started 
+          restart: true
+    build: ./backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - waygo-network
+    restart: always
+
+networks:
+  waygo-network:
+    driver: bridge

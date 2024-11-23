@@ -17,15 +17,14 @@ server.register(rideRoutes, {
 })
 server.register(driverRoutes)
 
-server.get('/', () => {
-    return { 
-        message: 'Hello World'
-    }
+server.get('/', (_, res) => {
+    res.send({ message: 'Hello World' })
 })
 
 
 server.listen({
-    port: 8080
+    port: 8080,
+    host: '0.0.0.0'
 }, () => {
     console.log('Server listening at port 8080') 
 })
