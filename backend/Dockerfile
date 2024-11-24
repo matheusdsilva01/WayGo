@@ -6,8 +6,8 @@ COPY . ./
 
 RUN npm install
 
-RUN npx prisma db push
-
-CMD [ "npm", "run", "dev" ]
-
 EXPOSE 8080
+
+ENV GOOGLE_API_KEY=${GOOGLE_API_KEY}
+
+CMD [ "npm", "run", "start" ]

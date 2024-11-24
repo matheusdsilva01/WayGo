@@ -2,6 +2,8 @@ import fastify from 'fastify'
 import cors from '@fastify/cors'
 import { rideRoutes } from './routes/ride'
 import { driverRoutes } from 'routes/driver'
+import dotenv from 'dotenv'
+
 
 const server = fastify()
 
@@ -24,7 +26,8 @@ server.get('/', (_, res) => {
 
 server.listen({
     port: 8080,
-    host: '0.0.0.0'
+    host: process.env.HOST || '0.0.0.0'
 }, () => {
     console.log('Server listening at port 8080') 
+    dotenv.config()
 })
