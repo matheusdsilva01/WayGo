@@ -20,7 +20,6 @@ services:
       timeout: 5s
       retries: 55
 
-
   backend:
     build: ./backend
     ports:
@@ -42,13 +41,17 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-    env_file:
-      - .env
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     ports:
       - "3000:3000"
     networks:
       - waygo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55
 
 networks:
   waygo-network:

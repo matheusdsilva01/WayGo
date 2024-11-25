@@ -2,9 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY . ./waygo-front
-
-WORKDIR /app/waygo-front
+COPY . ./
 
 RUN npm install
 
