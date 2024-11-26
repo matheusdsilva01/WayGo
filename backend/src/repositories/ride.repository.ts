@@ -1,5 +1,6 @@
 import { prisma } from 'database/prisma-client'
 import { NoRidesFoundError } from 'errors/NoRidesFoundError'
+import { NoRidesFoundForDriverError } from 'errors/NoRidesFoundErrorForDriverError'
 import { Ride, RideCreateBody, RideRepository } from 'interfaces/ride.interface'
 
 export class RideRepositoryPrisma implements RideRepository {
@@ -29,7 +30,7 @@ export class RideRepositoryPrisma implements RideRepository {
             }
         })
         if (!data.length && driver_id) {
-            throw new NoRidesFoundError('No rides found for this driver')
+            throw new NoRidesFoundForDriverError('No rides found for this driver')
         }
         if (!data.length) {
             throw new NoRidesFoundError('No rides found')

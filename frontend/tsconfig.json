@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "types": [
+      "google.maps"
+    ],
+    "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -17,6 +21,7 @@
         "name": "next"
       }
     ],
+    "baseUrl": "",
     "paths": {
       "@/*": ["./src/*"]
     }

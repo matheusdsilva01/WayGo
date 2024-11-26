@@ -1,110 +1,103 @@
 "use client"
-import axios from "axios";
-import Image from "next/image";
-import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { APIProvider } from "@vis.gl/react-google-maps"
+import { AxiosError } from "axios"
+import { LoaderCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { toast } from "react-toastify"
+import { z } from "zod"
+import { Button, Input } from "@/components/common"
+import { PlaceAutocompleteClassic } from "@/components/google/autocomplete"
+import { useCreateEstimateRide } from "@/hooks/requests"
 
-export default function Home() {
-  useEffect(() => {
-    (async () => {
-      const { data } = await axios.get("http://localhost:8080/")
-      console.log(data)
-    })();
-  }, [])
+const schema = z.object({
+  customer_id: z.string().min(1),
+  origin: z.string().min(1),
+  destination: z.string().min(1),
+})
+
+type schemaType = z.infer<typeof schema>
+
+const Home = () => {
+  const route = useRouter()
+  const { mutateAsync, isPending } = useCreateEstimateRide()
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<schemaType>({
+    resolver: zodResolver(schema),
+  })
+
+  async function onSubmit(data: schemaType) {
+    try {
+      await mutateAsync(data)
+      toast.success("Viagem pedida com sucesso")
+      route.push(`/ride-options?customer_id=${data.customer_id}`)
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return toast.error(error.response?.data.error_description)
+      }
+      toast.error("Erro ao pedir viagem")
+    }
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex h-full w-full">
+      <div className="m-auto mt-8 w-full max-w-lg rounded-md border border-zinc-500 bg-zinc-950 p-6 shadow">
+        <h1 className="text-xl font-bold text-primary">Pedir uma viagem</h1>
+        <p className="mb-4 text-sm text-gray-400">
+          Para pedir uma viagem, preencha os campos abaixo.
+        </p>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <Input
+            register={register("customer_id")}
+            placeholder="User id"
+            error={!!errors.customer_id}
+          />
+          <APIProvider
+            apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY as string}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            <PlaceAutocompleteClassic
+              onPlaceSelect={e => {
+                setValue("origin", e?.formatted_address as string, {
+                  shouldDirty: true,
+                })
+              }}
+            >
+              {ref => (
+                <Input placeholder="Origem" error={!!errors.origin} ref={ref} />
+              )}
+            </PlaceAutocompleteClassic>
+            <PlaceAutocompleteClassic
+              onPlaceSelect={e => {
+                setValue("destination", e?.formatted_address as string, {
+                  shouldDirty: true,
+                })
+              }}
+            >
+              {ref => (
+                <Input
+                  ref={ref}
+                  placeholder="Destino"
+                  error={!!errors.destination}
+                />
+              )}
+            </PlaceAutocompleteClassic>
+          </APIProvider>
+          <Button type="submit" color="primary">
+            {isPending ? (
+              <LoaderCircle className="m-auto animate-spin" />
+            ) : (
+              "Pedir viagem"
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
-  );
+  )
 }
+
+export default Home
