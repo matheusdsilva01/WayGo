@@ -1,6 +1,6 @@
-import { RouteNotFound } from 'errors/RouteNotFoundError'
+import { RouteNotFound } from 'errors'
 import { mapsApi } from 'external/maps-api'
-import { getRouteBody, getRouteResponse, mapsApiRepository } from 'interfaces/external/maps.interface'
+import { getRouteBody, getRouteResponse, mapsApiRepository } from 'interfaces/external'
 
 export class MapsApiRepository implements mapsApiRepository {
     async getRoutePath(body: getRouteBody): Promise<getRouteResponse> {
@@ -17,7 +17,7 @@ export class MapsApiRepository implements mapsApiRepository {
         })
 
         if (!data.routes || !data.routes[0].distanceMeters) {
-            throw new RouteNotFound('Route not found')
+            throw new RouteNotFound('Ride not found')
         }
         return data
     }

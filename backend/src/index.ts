@@ -1,7 +1,6 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
-import { rideRoutes } from './routes/ride'
-import { driverRoutes } from 'routes/driver'
+import { rideRoutes, driverRoutes } from 'routes'
 import dotenv from 'dotenv'
 
 

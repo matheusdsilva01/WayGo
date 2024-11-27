@@ -1,5 +1,5 @@
-import { getRouteBody, getRouteResponse, mapsApiRepository } from 'interfaces/external/maps.interface'
-import { MapsApiRepository } from 'repositories/external/maps-api.repository'
+import { getRouteBody, getRouteResponse, mapsApiRepository } from 'interfaces/external'
+import { MapsApiRepository } from 'repositories/external'
 
 export class MapsApiUseCase {
     private mapsApiRepository: mapsApiRepository

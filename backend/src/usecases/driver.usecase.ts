@@ -1,5 +1,5 @@
-import { Driver, DriverRepository } from 'interfaces/driver.interface'
-import { DriverRepositoryPrisma } from 'repositories/driver.respository'
+import { Driver, DriverRepository } from 'interfaces'
+import { DriverRepositoryPrisma } from 'repositories'
 
 export class DriverUseCase {
     private DriverRepository: DriverRepository

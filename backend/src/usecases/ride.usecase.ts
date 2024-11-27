@@ -1,5 +1,5 @@
-import { Ride, RideCreateBody, RideRepository } from 'interfaces/ride.interface'
-import { RideRepositoryPrisma } from 'repositories/ride.repository'
+import { Ride, RideCreateBody, RideRepository } from 'interfaces'
+import { RideRepositoryPrisma } from 'repositories'
 
 export class RideUseCase {
     private rideRepository: RideRepository

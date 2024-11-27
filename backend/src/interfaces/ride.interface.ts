@@ -1,3 +1,5 @@
+import { Driver } from './driver.interface'
+
 export interface Ride {
     id: number
     customer_id: string
@@ -16,7 +18,10 @@ export interface RideCreateBody {
     destination: string
     distance: number
     duration: string
-    driver_id: number
+    driver: {
+        id: number
+        name: string
+    }
     value: number
 }
 
@@ -26,7 +31,37 @@ export interface RideEstimateBody {
     destination: string
 }
 
+export interface RideEstimateResponse {
+    origin: {
+        latitude: number
+        longitude: number
+    }
+    destination: {
+        latitude: number
+        longitude: number
+    }
+    distanceMeters: number
+    distance: string
+    duration: string
+    options: Driver[]
+    routeResponse: object
+}
+
+export interface RideListParams {
+    customer_id: string
+    driver_id?: number
+}
+
 export interface RideRepository {
     create(ride: RideCreateBody): Promise<Ride>
     list(customer_id: string, driver_id?: number): Promise<Ride[]>
+}
+
+export interface RideController {
+    estimate({ destination, origin }: {
+        destination: string
+        origin: string
+    }): Promise<RideEstimateResponse>
+    confirm(body: RideCreateBody): Promise<void>
+    list(params: RideListParams): Promise<Ride[]>
 }

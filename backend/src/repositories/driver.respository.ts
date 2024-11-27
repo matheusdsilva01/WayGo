@@ -1,6 +1,6 @@
 import { prisma } from 'database/prisma-client'
-import { DriverNotFoundError } from 'errors/DriverNotFoundError'
-import { Driver, DriverRepository } from 'interfaces/driver.interface'
+import { DriverNotFoundError } from 'errors'
+import { Driver, DriverRepository } from 'interfaces'
 
 export class DriverRepositoryPrisma implements DriverRepository {
 

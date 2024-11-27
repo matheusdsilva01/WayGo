@@ -1,12 +1,19 @@
 import { prisma } from 'database/prisma-client'
-import { NoRidesFoundError } from 'errors/NoRidesFoundError'
-import { NoRidesFoundForDriverError } from 'errors/NoRidesFoundErrorForDriverError'
-import { Ride, RideCreateBody, RideRepository } from 'interfaces/ride.interface'
+import { NoRidesFoundError, NoRidesFoundForDriverError } from 'errors'
+import { Ride, RideCreateBody, RideRepository } from 'interfaces'
 
 export class RideRepositoryPrisma implements RideRepository {
     async create(ride: RideCreateBody): Promise<Ride> {
         const data = await prisma.ride.create({
-            data: ride
+            data: {
+                customer_id: ride.customer_id,
+                origin: ride.origin,
+                destination: ride.destination,
+                distance: ride.distance,
+                duration: ride.duration,
+                driver_id: ride.driver.id,
+                value: ride.value
+            }
         })
         return data
     }
