@@ -27,7 +27,6 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
   const { mutateAsync, isPending } = useCreateRide()
 
   async function onCreateRide() {
-    const value = Math.round(Number(rideData.distance) / 1000) * driver.value
 
     try {
       await mutateAsync({
@@ -37,7 +36,7 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
         customer_id: rideData.customer_id,
         destination: rideData.destination,
         origin: rideData.origin,
-        value,
+        value: driver.value,
       })
       toast.success("Viagem pedida com sucesso")
       router.push(`/ride-list?customer_id=${rideData.customer_id}`)
@@ -64,9 +63,7 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
             <p>{driver.vehicle}</p>
           </div>
           <p className="text-right font-bold text-primary md:text-lg">
-            {formatCurrency(
-              Math.round(Number(rideData.distance) / 1000) * driver.value,
-            )}
+            {formatCurrency(driver.value)}
           </p>
         </div>
       </div>

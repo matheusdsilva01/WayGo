@@ -26,14 +26,17 @@ export class RideControllerImpl implements RideController {
                 distance: routePath.routes[0].distanceMeters,
                 duration: routePath.routes[0].localizedValues.duration.text
             }
-        
+            
             const routeDistance = routePath.routes[0].distanceMeters
             const kmMin = Math.round(Number(routeDistance) / 1000)
             const drivers = await driverUseCase.listByKmMin(kmMin)
-
+            
             return {
                 ...formattedRoutePath,
-                options: drivers,
+                options: drivers.map(driver => ({
+                    ...driver,
+                    value: Math.round(Number(routePath.routes[0].distanceMeters) / 1000) * driver.value
+                })),
                 routeResponse: routePath
             }
         } catch (error) {
