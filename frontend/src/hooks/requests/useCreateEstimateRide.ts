@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { AxiosError } from "axios"
 import { api } from "@/api"
 import { Driver } from "@/types/entities/Driver"
 
@@ -62,6 +63,10 @@ export interface CreateEstimateRideCache extends CreateEstimateRideResponse {
   }
 }
 
+const errorsMap = new Map([
+  ["ROUTE_NOT_FOUND", "Não foi possível encontrar uma rota para o destino"],
+])
+
 export function useCreateEstimateRide() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -76,11 +81,19 @@ export function useCreateEstimateRide() {
       })
     },
     mutationFn: async (params: CreateEstimateRideParams) => {
-      const response = await api.post<CreateEstimateRideResponse>(
-        "/ride/estimate",
-        params,
-      )
-      return response.data
+      try {
+        const response = await api.post<CreateEstimateRideResponse>(
+          "/ride/estimate",
+          params,
+        )
+        return response.data
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const message = errorsMap.get(error.response?.data.error_code)
+          throw new Error(message || "Erro ao estimar viagem")
+        }
+        throw error
+      }
     },
   })
 }

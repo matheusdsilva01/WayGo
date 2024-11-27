@@ -18,8 +18,8 @@ export function useGetRideList({
   driver_id,
 }: useGetRideListParams) {
   return useQuery({
-    queryKey: ["ride-list"],
-    queryFn: async () => {
+    queryKey: ["ride-list", customer_id, driver_id],
+    queryFn: async ({ queryKey: [, customer_id] }) => {
       const response = await api.get<Ride[]>(`/ride/${customer_id}`, {
         params: {
           driver_id,

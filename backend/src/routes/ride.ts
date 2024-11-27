@@ -27,38 +27,44 @@ export async function rideRoutes(server: FastifyInstance) {
 
         const mapsApiUseCase = new MapsApiUseCase()
         const driverUseCase = new DriverUseCase()
+        try {
 
-        const routePath = await mapsApiUseCase.getRoutePath({
-            destination,
-            origin
-        })
-        const formattedRoutePath = {
-            origin: routePath.routes[0].legs[0].startLocation.latLng,
-            destination: routePath.routes[0].legs[0].endLocation.latLng,
-            distanceMeters: routePath.routes[0].distanceMeters,
-            distance: routePath.routes[0].localizedValues.distance.text,
-            duration: routePath.routes[0].localizedValues.duration.text
-        }
+            const routePath = await mapsApiUseCase.getRoutePath({
+                destination,
+                origin
+            })
+            const formattedRoutePath = {
+                origin: routePath.routes[0].legs[0].startLocation.latLng,
+                destination: routePath.routes[0].legs[0].endLocation.latLng,
+                distanceMeters: routePath.routes[0].distanceMeters,
+                distance: routePath.routes[0].localizedValues.distance.text,
+                duration: routePath.routes[0].localizedValues.duration.text
+            }
 
-        if (!routePath.routes[0].distanceMeters) {
+            const routeDistance = routePath.routes[0].distanceMeters
+            const kmMin = Math.round(Number(routeDistance) / 1000)
+            const drivers = await driverUseCase.listByKmMin(kmMin)
+
+            res.send({
+                ...formattedRoutePath,
+                options: drivers,
+                routeResponse: routePath
+            })
+        } catch (error) {
+            if (error instanceof Error) {
+                return res.status(400).send({
+                    error_code: error.name,
+                    error_description: error.message
+                })
+            }
             return res.status(400).send({
-                error_code: 'ROUTE_NOT_FOUND',
-                error_description: 'The route was not found'
+                error_code: 'SOMETHING_WENT_WRONG',
+                error_description: 'An unexpected error occurred'
             })
         }
-
-        const routeDistance = routePath.routes[0].distanceMeters
-        const kmMin = Math.round(Number(routeDistance) / 1000)
-        const drivers = await driverUseCase.listByKmMin(kmMin)
-
-        res.send({
-            ...formattedRoutePath,
-            options: drivers,
-            routeResponse: routePath
-        })
     })
 
-    server.post<{ Body: RideCreateBody }>('/confirm', async (req, res) => {
+    server.patch<{ Body: RideCreateBody }>('/confirm', async (req, res) => {
         const rideUseCase = new RideUseCase()
         const driverUseCase = new DriverUseCase()
 

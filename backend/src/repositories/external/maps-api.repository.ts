@@ -1,3 +1,4 @@
+import { RouteNotFound } from 'errors/RouteNotFoundError'
 import { mapsApi } from 'external/maps-api'
 import { getRouteBody, getRouteResponse, mapsApiRepository } from 'interfaces/external/maps.interface'
 
@@ -14,7 +15,10 @@ export class MapsApiRepository implements mapsApiRepository {
             travelMode: 'DRIVE',
             units: 'metric'    
         })
-        
+
+        if (!data.routes || !data.routes[0].distanceMeters) {
+            throw new RouteNotFound('Route not found')
+        }
         return data
     }
     

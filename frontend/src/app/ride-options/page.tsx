@@ -2,13 +2,11 @@
 import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { APIProvider, Map } from "@vis.gl/react-google-maps"
-import { AxiosError } from "axios"
 import { LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { toast } from "react-toastify"
 import { Directions } from "@/components/google/directions"
 import { CardDriver } from "@/components/ui"
-import { CreateEstimateRideCache, useCreateRide } from "@/hooks/requests"
+import { CreateEstimateRideCache } from "@/hooks/requests"
 
 interface PageProps {
   searchParams: {
@@ -24,32 +22,6 @@ const page = (params: PageProps) => {
     queryKey: ["estimate-ride", customer_id],
     retry: 1,
   })
-  const { mutateAsync, isPending } = useCreateRide()
-  function onCreateRide(driverId: number) {
-    const driverSelected = data?.options?.find(
-      driver => driver.id === driverId,
-    )!
-    const value =
-      Math.round(Number(data!.distanceMeters) / 1000) * driverSelected.value
-    try {
-      mutateAsync({
-        driver_id: driverId,
-        distance: data!.distanceMeters,
-        duration: data!.duration,
-        customer_id,
-        destination: data!.address.destination,
-        origin: data!.address.origin,
-        value,
-      })
-      toast.success("Viagem pedida com sucesso")
-      router.push(`/ride-list?customer_id=${customer_id}`)
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return toast.error(error.response?.data.error_description)
-      }
-      toast.error("Erro ao pedir viagem")
-    }
-  }
 
   useEffect(() => {
     if (!data && isFetched) {
@@ -98,16 +70,25 @@ const page = (params: PageProps) => {
           </APIProvider>
         </div>
         <section className="mt-4 flex flex-col items-center gap-6">
-          {data?.options &&
+          {data?.options.length ? (
             data?.options?.map(driver => (
               <CardDriver
-                loading={isPending}
                 key={driver.id}
                 driver={driver}
-                distanceRide={data.distanceMeters}
-                handleCreateRide={() => onCreateRide(driver.id)}
+                rideData={{
+                  distance: data.distanceMeters,
+                  duration: data.duration,
+                  customer_id,
+                  destination: data.address.destination,
+                  origin: data.address.origin,
+                }}
               />
-            ))}
+            ))
+          ) : (
+            <p className="text-center text-lg font-semibold text-gray-400">
+              Nenhum motorista disponível para essa viagem
+            </p>
+          )}
         </section>
       </div>
     </div>

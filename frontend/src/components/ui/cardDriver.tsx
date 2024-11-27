@@ -1,24 +1,54 @@
 "use client"
 
 import React from "react"
+import { AxiosError } from "axios"
 import { Car, LoaderCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { useCreateRide } from "@/hooks/requests"
 import { Driver } from "@/types/entities/Driver"
 import { formatCurrency } from "@/util"
 import { Button } from "../common"
 
 interface CardDriverProps {
   driver: Driver
-  distanceRide: number
-  loading: boolean
-  handleCreateRide: () => void
+  rideData: {
+    origin: string
+    destination: string
+    duration: string
+    distance: number
+    customer_id: string
+  }
 }
 
-export const CardDriver = ({
-  driver,
-  distanceRide,
-  loading,
-  handleCreateRide,
-}: CardDriverProps) => {
+export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
+  const driverId = driver.id
+  const router = useRouter()
+  const { mutateAsync, isPending } = useCreateRide()
+
+  function onCreateRide() {
+    const value = Math.round(Number(rideData.distance) / 1000) * driver.value
+
+    try {
+      mutateAsync({
+        driver_id: driverId,
+        distance: rideData.distance,
+        duration: rideData.duration,
+        customer_id: rideData.customer_id,
+        destination: rideData.destination,
+        origin: rideData.origin,
+        value,
+      })
+      toast.success("Viagem pedida com sucesso")
+      router.push(`/ride-list?customer_id=${rideData.customer_id}`)
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return toast.error(error.response?.data.error_description)
+      }
+      toast.error("Erro ao pedir viagem")
+    }
+  }
+
   return (
     <div className="max-w-lg rounded-md border border-zinc-500 bg-zinc-950 p-4 shadow">
       <div className="flex justify-between">
@@ -34,20 +64,24 @@ export const CardDriver = ({
           </div>
           <p className="text-right text-lg font-bold text-primary">
             {formatCurrency(
-              Math.round(Number(distanceRide) / 1000) * driver.value,
+              Math.round(Number(rideData.distance) / 1000) * driver.value,
             )}
           </p>
         </div>
       </div>
       <p className="mb-6 mt-4 text-sm text-zinc-200">{driver.description}</p>
       <Button
-        disabled={loading}
+        disabled={isPending}
         color="primary"
         fullWidth
         size="sm"
-        onClick={handleCreateRide}
+        onClick={() => onCreateRide()}
       >
-        Confirmar motorista
+        {isPending ? (
+          <LoaderCircle className="m-auto animate-spin" />
+        ) : (
+          "Selecionar motorista"
+        )}
       </Button>
     </div>
   )

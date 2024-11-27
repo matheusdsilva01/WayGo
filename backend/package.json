@@ -9,8 +9,11 @@
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "npx prisma migrate deploy && npm run dev",
+    "start": "npx prisma migrate deploy && npx prisma db seed && npm run dev",
     "lint": "eslint"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "matheusdsilva01",

@@ -22,7 +22,7 @@ export function useCreateRide() {
       })
     },
     mutationFn: async (data: CreateRideData) => {
-      const response = await api.post("/ride/confirm", data)
+      const response = await api.patch("/ride/confirm", data)
       return response.data
     },
   })

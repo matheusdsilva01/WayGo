@@ -25,14 +25,14 @@ const schema = z.object({
 type schemaType = z.infer<typeof schema>
 
 const page = (props: pageProps) => {
-  const { register, handleSubmit, setValue } = useForm<schemaType>({
+  const { register, handleSubmit, setValue, watch } = useForm<schemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
       customer_id: props.searchParams.customer_id,
     },
   })
 
-  const { data } = useGetDriverList()
+  const { data: driverList } = useGetDriverList()
   const {
     data: rideList,
     mutateAsync,
@@ -61,7 +61,7 @@ const page = (props: pageProps) => {
         customer_id: props.searchParams.customer_id,
       })
     }
-  }, [props])
+  }, [])
 
   return (
     <div className="m-auto w-full max-w-7xl px-8 py-6">
@@ -71,7 +71,8 @@ const page = (props: pageProps) => {
       <section className="rounded-md border border-zinc-500 bg-zinc-950 p-6">
         <h3 className="text-lg font-semibold">Filtros</h3>
         <p className="text-sm text-zinc-400">
-          Filtre por ID do cliente e também por Motorista
+          Informe o ID do cliente para buscar as viagens, você também pode
+          filtrar por um motorista específico
         </p>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -94,7 +95,7 @@ const page = (props: pageProps) => {
             <option value={0} className="bg-zinc-700">
               Todos
             </option>
-            {data?.map(driver => (
+            {driverList?.map(driver => (
               <option key={driver.id} value={driver.id} className="bg-zinc-700">
                 {driver.name}
               </option>
@@ -112,6 +113,7 @@ const page = (props: pageProps) => {
         {!rideList?.length && !isPending && (
           <p className="text-center text-lg font-semibold">
             Nenhuma viagem encontrada
+            {!watch("customer_id") && ", insira um ID de usuário"}
           </p>
         )}
         {rideList?.length && (
@@ -119,18 +121,18 @@ const page = (props: pageProps) => {
             <thead className="text-zinc-300">
               <tr>
                 <th className="border-b border-zinc-500 p-4 pb-3 pl-12 pt-0 text-left font-medium">
-                  Data
+                  Data e hora
                 </th>
                 <th className="border-b border-zinc-500 p-4 pb-3 pt-0 text-left font-medium">
                   Motorista
                 </th>
-                <th className="border-b border-zinc-500 p-4 pb-3 pr-12 pt-0 text-left font-medium">
+                <th className="border-b border-zinc-500 p-4 pb-3 pt-0 text-left font-medium">
                   Destino
                 </th>
-                <th className="border-b border-zinc-500 p-4 pb-3 pr-12 pt-0 text-left font-medium">
+                <th className="border-b border-zinc-500 p-4 pb-3 pt-0 text-left font-medium">
                   Distancia
                 </th>
-                <th className="border-b border-zinc-500 p-4 pb-3 pr-12 pt-0 text-left font-medium">
+                <th className="border-b border-zinc-500 p-4 pb-3 pt-0 text-left font-medium">
                   Duração
                 </th>
                 <th className="border-b border-zinc-500 p-4 pb-3 pr-12 pt-0 text-left font-medium">
@@ -141,7 +143,7 @@ const page = (props: pageProps) => {
             <tbody className="bg-zinc-900">
               {rideList?.map(ride => (
                 <tr key={ride.id}>
-                  <td className="border-b border-zinc-500 p-4 pl-8">
+                  <td className="whitespace-nowrap border-b border-zinc-500 p-4 pl-8">
                     {dayjs(ride.createdAt).format("DD/MM/YYYY HH:mm")}
                   </td>
                   <td className="border-b border-zinc-500 p-4">
@@ -153,7 +155,7 @@ const page = (props: pageProps) => {
                   <td className="border-b border-zinc-500 p-4">
                     {formatDistance(ride.distance / 1000)}
                   </td>
-                  <td className="border-b border-zinc-500 p-4">
+                  <td className="whitespace-nowrap border-b border-zinc-500 p-4">
                     {ride.duration}
                   </td>
                   <td className="border-b border-zinc-500 p-4 pr-8">
