@@ -23,6 +23,9 @@ export async function rideRoutes(server: FastifyInstance) {
     
             const { destination, origin } = body.data!
 
+            if (destination === origin) {
+                throw new InvalidDataError('The data provided is invalid')
+            }
             const data = await rideController.estimate({ destination,
                 origin })
             res.send(data)
@@ -68,6 +71,12 @@ export async function rideRoutes(server: FastifyInstance) {
             })
         } catch (error) {
             if (error instanceof Error) {
+                if (error.name === 'DRIVER_NOT_FOUND') {
+                    return res.status(404).send({
+                        error_code: 'DRIVER_NOT_FOUND',
+                        error_description: 'Driver not found'
+                    })
+                }
                 return res.status(400).send({
                     error_code: error.name,
                     error_description: error.message

@@ -6,7 +6,7 @@ import { Car, LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-toastify"
 import { useCreateRide } from "@/hooks/requests"
-import { Driver } from "@/types/entities/Driver"
+import { Driver } from "@/types/entities"
 import { formatCurrency } from "@/util"
 import { Button } from "../common"
 
@@ -26,12 +26,12 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
   const router = useRouter()
   const { mutateAsync, isPending } = useCreateRide()
 
-  function onCreateRide() {
+  async function onCreateRide() {
     const value = Math.round(Number(rideData.distance) / 1000) * driver.value
 
     try {
-      mutateAsync({
-        driver_id: driverId,
+      await mutateAsync({
+        driver: { id: driverId, name: driver.name },
         distance: rideData.distance,
         duration: rideData.duration,
         customer_id: rideData.customer_id,
@@ -59,10 +59,11 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
           </span>
         </div>
         <div>
-          <div className="flex gap-2 text-sm text-zinc-300">
-            <Car width={18} height={18} /> <p>{driver.vehicle}</p>
+          <div className="flex gap-2 text-end text-xs text-zinc-300 md:text-sm">
+            <Car width={18} height={18} className="hidden md:block" />{" "}
+            <p>{driver.vehicle}</p>
           </div>
-          <p className="text-right text-lg font-bold text-primary">
+          <p className="text-right font-bold text-primary md:text-lg">
             {formatCurrency(
               Math.round(Number(rideData.distance) / 1000) * driver.value,
             )}
@@ -80,7 +81,7 @@ export const CardDriver = ({ driver, rideData }: CardDriverProps) => {
         {isPending ? (
           <LoaderCircle className="m-auto animate-spin" />
         ) : (
-          "Selecionar motorista"
+          "Selecionar"
         )}
       </Button>
     </div>

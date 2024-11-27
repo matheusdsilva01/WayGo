@@ -8,7 +8,11 @@ import type { Metadata } from "next"
 import "./globals.css"
 import "react-toastify/dist/ReactToastify.css"
 
-const inter = Inter({ subsets: ["latin"], display: "swap", adjustFontFallback: true })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  adjustFontFallback: true,
+})
 
 export const metadata: Metadata = {
   title: "WayGO",

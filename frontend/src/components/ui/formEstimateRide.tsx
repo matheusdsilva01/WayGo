@@ -1,13 +1,13 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { APIProvider } from "@vis.gl/react-google-maps"
+import { APIProvider, Map } from "@vis.gl/react-google-maps"
 import { LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
 import { z } from "zod"
 import { Button, Input } from "@/components/common"
-import { PlaceAutocompleteClassic } from "@/components/google/autocomplete"
+import { PlaceAutocomplete } from "@/components/google"
 import { useCreateEstimateRide } from "@/hooks/requests"
 
 const schema = z.object({
@@ -25,6 +25,7 @@ export const FormEstimateRide = () => {
   const {
     register,
     handleSubmit,
+    watch,
     setValue,
     formState: { errors },
   } = useForm<schemaType>({
@@ -61,36 +62,64 @@ export const FormEstimateRide = () => {
           <APIProvider
             apiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY as string}
           >
-            <PlaceAutocompleteClassic
-              onPlaceSelect={e => {
-                setValue("origin", e?.formatted_address as string, {
+            <Map
+              defaultZoom={3}
+              defaultCenter={{ lat: -14.235004, lng: -51.92528 }}
+            />
+            <PlaceAutocomplete
+              inputValue={watch("origin")}
+              setInputValue={value =>
+                setValue("origin", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+              onPlaceSelect={place => {
+                setValue("origin", place?.formatted_address as string, {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
               }}
             >
-              {ref => (
-                <Input placeholder="Origem" error={!!errors.origin} ref={ref} />
-              )}
-            </PlaceAutocompleteClassic>
-            <PlaceAutocompleteClassic
+              <Input
+                onKeyDown={event => {
+                  if (event.key === "Enter") {
+                    event.preventDefault()
+                  }
+                }}
+                register={register("origin")}
+                placeholder="Origem"
+                error={!!errors.origin}
+              />
+            </PlaceAutocomplete>
+            <PlaceAutocomplete
               onPlaceSelect={e => {
                 setValue("destination", e?.formatted_address as string, {
                   shouldDirty: true,
                   shouldValidate: true,
                 })
               }}
+              inputValue={watch("destination")}
+              setInputValue={value =>
+                setValue("destination", value, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
             >
-              {ref => (
-                <Input
-                  ref={ref}
-                  placeholder="Destino"
-                  error={!!errors.destination}
-                />
-              )}
-            </PlaceAutocompleteClassic>
+              <Input
+                onKeyDown={event => {
+                  if (event.key === "Enter") {
+                    event.preventDefault()
+                  }
+                }}
+                register={register("destination")}
+                placeholder="Destino"
+                error={!!errors.destination}
+              />
+            </PlaceAutocomplete>
           </APIProvider>
-          <Button type="submit" color="primary">
+          <Button type="submit" color="primary" disabled={isPending}>
             {isPending ? (
               <LoaderCircle className="m-auto animate-spin" />
             ) : (

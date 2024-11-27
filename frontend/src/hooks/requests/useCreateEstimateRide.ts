@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import { api } from "@/api"
-import { Driver } from "@/types/entities/Driver"
+import { Driver } from "@/types/entities"
 
 export interface CreateEstimateRideParams {
   origin: string
@@ -18,8 +18,7 @@ export interface CreateEstimateRideResponse {
     latitude: number
     longitude: number
   }
-  distanceMeters: number
-  distance: string
+  distance: number
   duration: string
   options: Driver[]
   routeResponse: {

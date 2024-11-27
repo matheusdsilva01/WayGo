@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { APIProvider, Map } from "@vis.gl/react-google-maps"
 import { LoaderCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Directions } from "@/components/google/directions"
+import { Directions } from "@/components/google"
 import { CardDriver } from "@/components/ui"
 import { CreateEstimateRideCache } from "@/hooks/requests"
 
@@ -41,8 +41,8 @@ const page = (params: PageProps) => {
 
   return (
     <div className="flex h-full w-full">
-      <div className="m-auto mt-6 w-full max-w-[656px]">
-        <h1 className="mb-4 text-2xl font-bold text-primary">
+      <div className="m-auto mt-6 w-full max-w-[656px] p-2 md:p-0">
+        <h1 className="mb-4 text-xl font-bold text-primary md:text-2xl">
           Escolha um motorista para sua viagem
         </h1>
         <div className="h-80 w-full">
@@ -76,7 +76,7 @@ const page = (params: PageProps) => {
                 key={driver.id}
                 driver={driver}
                 rideData={{
-                  distance: data.distanceMeters,
+                  distance: data.distance,
                   duration: data.duration,
                   customer_id,
                   destination: data.address.destination,

@@ -1,4 +1,4 @@
-import { InvalidDistanceError } from 'errors'
+import { InvalidDataError, InvalidDistanceError } from 'errors'
 import { Ride, RideController, RideCreateBody, RideEstimateResponse, RideListParams } from 'interfaces'
 import { DriverUseCase, RideUseCase } from 'usecases'
 import { MapsApiUseCase } from 'usecases/external'
@@ -15,11 +15,15 @@ export class RideControllerImpl implements RideController {
                 destination,
                 origin
             })
+
+            if (!routePath.routes.length || !routePath.routes[0].distanceMeters) {
+                throw new InvalidDataError('No routes found')
+            }
+
             const formattedRoutePath = {
                 origin: routePath.routes[0].legs[0].startLocation.latLng,
                 destination: routePath.routes[0].legs[0].endLocation.latLng,
-                distanceMeters: routePath.routes[0].distanceMeters,
-                distance: routePath.routes[0].localizedValues.distance.text,
+                distance: routePath.routes[0].distanceMeters,
                 duration: routePath.routes[0].localizedValues.duration.text
             }
         

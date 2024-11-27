@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import dayjs from "dayjs"
 import { LoaderCircle } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { toast } from "react-toastify"
 import { z } from "zod"
 import { Button, Input } from "@/components/common"
 import { useGetDriverList, useGetRideListMutation } from "@/hooks/requests"
@@ -25,7 +24,7 @@ const schema = z.object({
 type schemaType = z.infer<typeof schema>
 
 const page = (props: pageProps) => {
-  const { register, handleSubmit, setValue, watch } = useForm<schemaType>({
+  const { register, handleSubmit, setValue } = useForm<schemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
       customer_id: props.searchParams.customer_id,
@@ -35,23 +34,17 @@ const page = (props: pageProps) => {
   const { data: driverList } = useGetDriverList()
   const {
     data: rideList,
-    mutateAsync,
     mutate,
     isPending,
+    error,
+    isError,
   } = useGetRideListMutation()
 
   async function onSubmit(data: schemaType) {
-    try {
-      await mutateAsync({
-        customer_id: data.customer_id,
-        driver_id: data.driver_id || undefined,
-      })
-    } catch (error) {
-      if (error instanceof Error) {
-        return toast.error(error.message)
-      }
-      toast.error("Erro ao buscar viagens")
-    }
+    mutate({
+      customer_id: data.customer_id,
+      driver_id: data.driver_id || undefined,
+    })
   }
 
   useEffect(() => {
@@ -64,11 +57,11 @@ const page = (props: pageProps) => {
   }, [])
 
   return (
-    <div className="m-auto w-full max-w-7xl px-8 py-6">
+    <div className="m-auto w-full max-w-7xl px-1 py-6 md:px-8">
       <h1 className="mb-4 text-center text-2xl font-bold text-primary">
         Histórico de viagens
       </h1>
-      <section className="rounded-md border border-zinc-500 bg-zinc-950 p-6">
+      <section className="rounded-md border border-zinc-500 bg-zinc-950  p-4 md:p-6">
         <h3 className="text-lg font-semibold">Filtros</h3>
         <p className="text-sm text-zinc-400">
           Informe o ID do cliente para buscar as viagens, você também pode
@@ -106,14 +99,15 @@ const page = (props: pageProps) => {
           </Button>
         </form>
       </section>
-      <section className="mt-14 overflow-auto rounded-md border border-zinc-500 bg-zinc-950 p-6 text-sm">
+      <section className="mt-6 overflow-auto rounded-md border border-zinc-500 bg-zinc-950 p-6 text-sm md:mt-14">
         {isPending && (
           <LoaderCircle className="m-auto animate-spin" size={32} />
         )}
         {!rideList?.length && !isPending && (
           <p className="text-center text-lg font-semibold">
-            Nenhuma viagem encontrada
-            {!watch("customer_id") && ", insira um ID de usuário"}
+            {isError
+              ? error.message
+              : "Digite um ID de usuário para buscar viagens"}
           </p>
         )}
         {rideList?.length && (

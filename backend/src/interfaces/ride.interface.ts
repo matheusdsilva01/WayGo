@@ -40,8 +40,7 @@ export interface RideEstimateResponse {
         latitude: number
         longitude: number
     }
-    distanceMeters: number
-    distance: string
+    distance: number
     duration: string
     options: Driver[]
     routeResponse: object

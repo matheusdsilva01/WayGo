@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { api } from "@/api"
-import { Driver } from "@/types/entities/Driver"
+import { Driver } from "@/types/entities"
 
 export function useGetDriverList() {
   return useQuery({

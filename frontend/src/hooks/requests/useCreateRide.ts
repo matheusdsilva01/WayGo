@@ -7,7 +7,10 @@ export interface CreateRideData {
   destination: string
   distance: number
   duration: string
-  driver_id: number
+  driver: {
+    id: number
+    name: string
+  }
   value: number
 }
 
@@ -17,9 +20,7 @@ export function useCreateRide() {
   return useMutation({
     mutationKey: ["confirm-ride"],
     onSuccess(_, variables) {
-      queryCLient.invalidateQueries({
-        queryKey: ["estimate-ride", variables.customer_id],
-      })
+      queryCLient.setQueryData(["rides", variables.customer_id], undefined)
     },
     mutationFn: async (data: CreateRideData) => {
       const response = await api.patch("/ride/confirm", data)

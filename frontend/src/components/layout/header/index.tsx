@@ -5,7 +5,15 @@ import Link from "next/link"
 export const Header = () => {
   return (
     <header className="flex w-full flex-row justify-between bg-zinc-900 px-5 py-2 text-center md:px-8 md:py-4">
-      <Image src="/logo.svg" alt="Logo" width={202} height={40} />
+      <Link href="/">
+        <Image
+          src="/logo.svg"
+          alt="Logo"
+          width={202}
+          height={40}
+          className="h-auto w-24 md:w-40"
+        />
+      </Link>
       <nav className="flex flex-row items-center gap-4 text-sm">
         <Link className="transition-all hover:underline" href="/">
           Pedir uma viagem
