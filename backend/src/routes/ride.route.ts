@@ -54,7 +54,7 @@ export async function rideRoutes(server: FastifyInstance) {
                 id: z.number().int().positive(),
                 name: z.string().min(1)
             }),
-            value: z.number().int().positive()
+            value: z.number().positive()
         })
         const body = schema.safeParse(req.body)
 
